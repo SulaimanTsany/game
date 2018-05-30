@@ -2,6 +2,7 @@ import java.util.Random;
 
 public class Minesweaper {
     protected char[][] board;
+    protected char[][] boardShow;
 	protected char bomSymbol;
     protected int height;
     protected int width;
@@ -21,9 +22,11 @@ public class Minesweaper {
     }
     public void makeBoard() {
         board = new char[this.height][this.width];
+        boardShow = new char[this.height][this.width];
         for (int i=0; i<this.height; i++) {
             for (int j=0; j<this.width; j++) {
                 board[i][j] = ' ';
+                boardShow[i][j] = '?';
             }
         }
     }
@@ -202,6 +205,7 @@ public class Minesweaper {
         return result;
     }
     public void showBoard() {
+        char[][] board = this.boardShow;
         for (int i=0; i<board.length; i++) {
             //first horizontal line
             if (i==0) {
