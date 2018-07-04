@@ -1,23 +1,41 @@
 import java.util.Random;
 
 public class Board {
-    protected char[][] board;
-    protected char[][] boardView;
-    protected boolean[][] board_isOpened;
-	protected char bombSymbol;
-    protected char boardViewSymbol;
-    protected int height;
-    protected int width;
-    protected int numberOfbombs;
-    protected boolean status_gameOver;
+    private char[][] board;
+    private char[][] boardView;
+    private boolean[][] board_isOpened;
+	private char bombSymbol;
+    private char boardViewSymbol;
+    private int height;
+    private int width;
+    private int numberOfBombs;
+    private String difficulty;
+    private boolean status_gameOver;
+    private boolean status_win;
+    private boolean status_play;
 
     public Board () {
 		bombSymbol = '*';
         status_gameOver = false;
+        status_win = false;
+        status_play = true;
     }
-    public Board(int height, int width, int bombs, char boardView, char bombSymbol) {
+    public Board (int height, int width, String difficulty, char boardView, char bombSymbol) {
         this.height = height;
         this.width = width;
+        int bombs = 0;
+        switch (difficulty) {
+            case "Normal":
+                bombs = (height*width)/5;
+                break;
+            case "Easy":
+                bombs = (height*width)/7;
+                break;
+            case "Hard":
+                bombs = (height*width)/3;
+                break;
+        }
+        numberOfBombs = bombs;
         setBoardViewSymbol('.');
         this.board = new char[this.height][this.width];
         this.boardView = new char[this.height][this.width];
@@ -25,6 +43,8 @@ public class Board {
         setBoardViewSymbol(boardView);
         setBombSymbol(bombSymbol);
         status_gameOver = false;
+        status_win = false;
+        status_play = true;
         for (int i=0; i<this.height; i++) {
             for (int j=0; j<this.width; j++) {
                 this.board[i][j] = ' ';
@@ -48,7 +68,7 @@ public class Board {
     public void setBombSymbol (char symbol) {
         this.bombSymbol = symbol;
     }
-    public void makeBoard() {
+    public void makeBoard () {
         board = new char[this.height][this.width];
         boardView = new char[this.height][this.width];
         board_isOpened = new boolean[this.height][this.width];
@@ -61,19 +81,31 @@ public class Board {
             }
         }
     }
-    public void setHeight(int height) {
+    public void setHeight (int height) {
         this.height = height;
     }
-    public void setWidth(int width) {
+    public void setWidth (int width) {
         this.width = width;
     }
-    public void setNumberOfBombs (int numberOfbombs) {
-        this.numberOfbombs = numberOfbombs;
+    public void setNumberOfBombs (int numberOfBombs) {
+        this.numberOfBombs = numberOfBombs;
     }
-    public int getNumberOfbombs () {
-        return numberOfbombs;
+    public int getNumberOfBombs () {
+        return numberOfBombs;
     }
-    public void generateBoard() {
+    public int getBoardHeight () {
+        return this.height;
+    }
+    public int getBoardWidth () {
+        return this.width;
+    }
+    public char getBombSymbol () {
+        return this.bombSymbol;
+    }
+    public char getBoardViewSymbol () {
+        return this.boardViewSymbol;
+    }
+    public void generateBoard () {
         generateBombs();
         for (int i=0; i<height; i++) {
             for (int j=0; j<width; j++) {
@@ -83,7 +115,7 @@ public class Board {
             }
         }
     }
-    public void showBoard(char[][] theBoard) {
+    public void showBoard (char[][] theBoard) {
         char[][] board = theBoard;
         for (int i=0; i<board.length; i++) {
             //first horizontal line
@@ -119,7 +151,12 @@ public class Board {
     public boolean getStatus_gameOver () {
         return this.status_gameOver;
     }
-
+    public boolean getStatus_win () {
+        return this.status_win;
+    }
+    public boolean getStatus_play () {
+        return this.status_play;
+    }
     public boolean inspect (int i, int j) {
         try {
             if (board_isOpened[i][j]) {
@@ -130,16 +167,31 @@ public class Board {
                 board_isOpened[i][j] = true;
                 if (board[i][j] == bombSymbol) {
                     status_gameOver = true;
+                    status_play = false;
                 }
             } else if (board[i][j] == ' ') {
-                System.out.println("Recursive on "+i+","+j);
+                //System.out.println("Recursive on "+i+","+j);
                 inspectRecursive(i,j);
             }
         } catch (Exception e) {
             return false;
         }
+        is_win();
         return true;
     }
+    public boolean is_win () {
+        for (int i=0; i<this.height; i++) {
+            for (int j=0; j<this.width; j++) {
+                if (board[i][j]!=bombSymbol && !board_isOpened[i][j]) {
+                    return false;
+                }
+            }
+        }
+        status_play = false;
+        status_win = true;
+        return true;
+    }
+
     private void inspectRecursive (int i, int j) {
         try {
             if (board[i][j] == ' ' && !board_isOpened[i][j]) {
@@ -165,7 +217,6 @@ public class Board {
         }
         return result;
     }
-
     private char countbombs (int i, int j) {
         int result =0;
         //hitung semua bom disekitar
@@ -291,10 +342,9 @@ public class Board {
 		}
         return ' ';
     }
-
     private void generateBombs() {
         Random random = new Random();
-        int bombs = this.numberOfbombs;
+        int bombs = this.numberOfBombs;
         int line = 0;
         while (bombs > 0) {
             for (int i=0; i<width; i++) {
