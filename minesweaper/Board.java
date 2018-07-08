@@ -25,13 +25,13 @@ public class Board {
         this.width = width;
         int bombs = 0;
         switch (difficulty) {
-            case "Normal":
+            case "normal":
                 bombs = (height*width)/5;
                 break;
-            case "Easy":
+            case "easy":
                 bombs = (height*width)/7;
                 break;
-            case "Hard":
+            case "hard":
                 bombs = (height*width)/3;
                 break;
         }

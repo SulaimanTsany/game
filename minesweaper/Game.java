@@ -2,14 +2,22 @@ import java.util.Scanner;
 
 public class Game {
     private Scanner scanner;
-    private String difficulty;
-    private Board board;
+    private static String difficulty;
+    private static int boardWidth;
+    private static int boardHeight;
+    private static char bombSymbol;
+    private static char boardSymbol;
+    private static Board board;
     private static Game game;
 
     public Game () {
         scanner = new Scanner(System.in);
-        difficulty = "Normal";
-        board = new Board(6, 5, difficulty, '.', 'X'); //bombs = 36, 19x11
+        difficulty = "normal";
+        boardHeight = 6;
+        boardWidth = 5;
+        boardSymbol = '.';
+        bombSymbol = 'X';
+        board = new Board(boardHeight, boardWidth, difficulty, boardSymbol, bombSymbol); //bombs = 36, 19x11
     }
     public static void main (String[] args) {
         game = new Game();
@@ -43,6 +51,12 @@ public class Game {
             } while (invalidSelected);
         } while (selected!=0);
     }
+    private static void setBoardHeight (int newHeight) {
+        boardHeight = newHeight;
+    }
+    private static void setBoardWidth (int newWidth) {
+        boardWidth = newWidth;
+    }
     private void menu () {
         System.out.println("--------------------Menu--------------------");
         System.out.println("1. Play game");
@@ -52,6 +66,7 @@ public class Game {
     }
     private int play () {
         board.showBoard(board.getBoard());
+        board.showBoard(board.getBoardView());
         do {
             int i,j;
             do {
@@ -80,31 +95,128 @@ public class Game {
         System.out.println("Created by me");
     }
     private void settings () {
-        /*
-        boardHeight = 19;
-        boardWidth = 11;
-        bombsEasy = (boardHeight*boardWidth)/7;
-        bombsNormal = (boardHeight*boardWidth)/5;
-        bombsHard = (boardHeight*boardWidth)/3;
-        maxBombs = (boardHeight*boardWidth)/2;
-        */
-        System.out.println("----------------Rule of Game----------------");
-        System.out.println("------------------Settings------------------");
-        System.out.println("Current Settings:");
-        System.out.println("Difficulty   = "+this.difficulty);
-        System.out.println("Board Height = "+board.getBoardHeight());
-        System.out.println("Board Width  = "+board.getBoardWidth());
-        System.out.println("Bombs        = "+board.getNumberOfBombs());
-        System.out.println("Bobms Symbol = "+"\" "+board.getBombSymbol()+" \"");
-        System.out.println("Boards Symbol= "+"\" "+board.getBoardViewSymbol()+" \"");
-        System.out.print("Edit settings (y/n)? : ");
-        String selected = scanner.next();
-        if (selected.equalsIgnoreCase("y") || selected.equalsIgnoreCase("yes")) {
-            editSettings();
-        }
+        boolean exitSettings = false;
+        do {
+            System.out.println("------------------Settings------------------");
+            System.out.println("Current Settings:");
+            System.out.println("Difficulty   = "+this.difficulty);
+            System.out.println("Board Height = "+board.getBoardHeight());
+            System.out.println("Board Width  = "+board.getBoardWidth());
+            System.out.println("Bombs        = "+board.getNumberOfBombs());
+            System.out.println("Bobm Symbol = "+"\" "+board.getBombSymbol()+" \"");
+            System.out.println("Board Symbol= "+"\" "+board.getBoardViewSymbol()+" \"");
+            System.out.print("Edit settings (y/n)? : ");
+            String selected = scanner.next();
+            if (selected.equalsIgnoreCase("y") || selected.equalsIgnoreCase("yes")) {
+                editSettingsMenu();
+                System.out.print("Do you want to apply (y/n)? : ");
+                String is_save = scanner.next();
+                if (is_save.equalsIgnoreCase("y") || is_save.equalsIgnoreCase("yes")) {
+                    board = new Board(boardHeight, boardWidth, difficulty, boardSymbol, bombSymbol);
+                }
+            }
+            else if (selected.equalsIgnoreCase("n") || selected.equalsIgnoreCase("no")) {
+                exitSettings = true;
+            }
+        } while (!exitSettings);
     }
-    private void editSettings () {
-        //edit setting bla bla bla
+    private void editSettingsMenu () {
+        System.out.println();
+        System.out.println("---------------Edit Settings----------------");
+        System.out.println("Menu settings:");
+        System.out.println("1. Difficulty");
+        System.out.println("2. Board size");
+        System.out.println("3. Bomb symbol");
+        System.out.println("4. Board symbol");
+        System.out.println("0. Cancel");
+        boolean invalidSelected = false;
+        do {
+            System.out.print("Please selected = ");
+            int selected = input();
+            switch (selected) {
+                case 1:
+                    edit_difficulty();
+                    invalidSelected = false;
+                    break;
+                case 2:
+                    edit_boardSize();
+                    invalidSelected = false;
+                    break;
+                case 3:
+                    edit_bombSymbol();
+                    invalidSelected = false;
+                    break;
+                case 4:
+                    edit_boardSymbol();
+                    invalidSelected = false;
+                    break;
+                case 0:
+                    invalidSelected = false;
+                    break;
+                default:
+                    System.out.println("selected invalid, please reinput!");
+                    invalidSelected = true;
+            }
+        } while (invalidSelected);
+    }
+    private void edit_difficulty () {
+        System.out.println();
+        System.out.println("Current Difficulty   = "+this.difficulty);
+        System.out.println("Difficulty:");
+        System.out.println("1. Easy");
+        System.out.println("2. Normal");
+        System.out.println("3. Hard");
+        System.out.println("0. Cancel");
+        boolean invalidSelected = false;
+        do {
+            System.out.print("Please selected difficulty = ");
+            int selected = input();
+            switch (selected) {
+                case 1:
+                    difficulty = "easy";
+                    invalidSelected = false;
+                    break;
+                case 2:
+                    difficulty = "normal";
+                    invalidSelected = false;
+                    break;
+                case 3:
+                    difficulty = "hard";
+                    invalidSelected = false;
+                    break;
+                case 0:
+                    invalidSelected = false;
+                    break;
+                default:
+                    System.out.println("selected invalid, please reinput!");
+                    invalidSelected = true;
+            }
+        } while (invalidSelected);
+    }
+    private void edit_boardSize () {
+        System.out.println();
+        System.out.println("Current Board Height = "+board.getBoardHeight());
+        System.out.println("Current Board Width  = "+board.getBoardWidth());
+        System.out.print("New height = ");
+        int newHeight = input();
+        boardHeight = newHeight;
+        System.out.print("New width  = ");
+        int newWidth = input();
+        boardWidth = newWidth;
+    }
+    private void edit_bombSymbol () {
+        System.out.println();
+        System.out.println("Current Bomb Symbol= "+"\" "+board.getBombSymbol()+" \"");
+        System.out.print("New Symbol = ");
+        char newSymbol = scanner.next().charAt(0);
+        bombSymbol = newSymbol;
+    }
+    private void edit_boardSymbol () {
+        System.out.println();
+        System.out.println("Current Board Symbol= "+"\" "+board.getBoardViewSymbol()+" \"");
+        System.out.print("New Symbol = ");
+        char newSymbol = scanner.next().charAt(0);
+        boardSymbol = newSymbol;
     }
     private int input () {
         boolean invalidInput = false;
