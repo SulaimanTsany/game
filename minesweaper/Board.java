@@ -14,7 +14,7 @@ public class Board {
     private boolean status_win;
     private boolean status_play;
 
-    public Board () {
+    public Board () { //useless
 		bombSymbol = '*';
         status_gameOver = false;
         status_win = false;
@@ -36,22 +36,11 @@ public class Board {
                 break;
         }
         numberOfBombs = bombs;
-        setBoardViewSymbol('.');
-        this.board = new char[this.height][this.width];
-        this.boardView = new char[this.height][this.width];
-        this.board_isOpened = new boolean[this.height][this.width];
         setBoardViewSymbol(boardView);
         setBombSymbol(bombSymbol);
         status_gameOver = false;
         status_win = false;
         status_play = true;
-        for (int i=0; i<this.height; i++) {
-            for (int j=0; j<this.width; j++) {
-                this.board[i][j] = ' ';
-                this.boardView[i][j] = boardViewSymbol;
-                this.board_isOpened[i][j] = false;
-            }
-        }
         makeBoard();
         setNumberOfBombs(bombs);
         generateBoard();
@@ -72,7 +61,6 @@ public class Board {
         board = new char[this.height][this.width];
         boardView = new char[this.height][this.width];
         board_isOpened = new boolean[this.height][this.width];
-        setBoardViewSymbol('.');
         for (int i=0; i<this.height; i++) {
             for (int j=0; j<this.width; j++) {
                 board[i][j] = ' ';
@@ -194,15 +182,22 @@ public class Board {
 
     private void inspectRecursive (int i, int j) {
         try {
+            boardView[i][j] = board[i][j];
             if (board[i][j] == ' ' && !board_isOpened[i][j]) {
-                boardView[i][j] = board[i][j];
+                //
                 board_isOpened[i][j] = true;
-                //showBoard(boardView);
+                inspectRecursive(i-1, j-1);
                 inspectRecursive(i-1, j);
+                inspectRecursive(i-1, j+1);
+                //
+                inspectRecursive(i+1, j-1);
                 inspectRecursive(i+1, j);
+                inspectRecursive(i+1, j+1);
+                //
                 inspectRecursive(i, j-1);
                 inspectRecursive(i, j+1);
             } else {
+                board_isOpened[i][j] = true;
                 return;
             }
         } catch (Exception e) {

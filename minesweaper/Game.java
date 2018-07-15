@@ -22,15 +22,17 @@ public class Game {
     public static void main (String[] args) {
         game = new Game();
         int selected = 0;
+        boolean gameOver = false;
         do {
             game.menu();
             boolean invalidSelected = true;
             do {
+                gameOver = false;
                 System.out.print("Input your selected menu = ");
                 selected = game.input();
                 switch (selected) {
                     case 1:
-                        selected = game.play();
+                        gameOver = game.play();
                         invalidSelected = false;
                         break;
                     case 2:
@@ -49,7 +51,7 @@ public class Game {
                         invalidSelected = true;
                 }
             } while (invalidSelected);
-        } while (selected!=0);
+        } while (selected!=0 || gameOver);
     }
     private static void setBoardHeight (int newHeight) {
         boardHeight = newHeight;
@@ -58,37 +60,43 @@ public class Game {
         boardWidth = newWidth;
     }
     private void menu () {
+        System.out.println();
         System.out.println("--------------------Menu--------------------");
         System.out.println("1. Play game");
         System.out.println("2. Rule of game");
         System.out.println("3. Settings");
         System.out.println("0. Exit");
     }
-    private int play () {
-        board.showBoard(board.getBoard());
+    private boolean play () {
+        //board.showBoard(board.getBoard());
+        board = new Board(boardHeight, boardWidth, difficulty, boardSymbol, bombSymbol);
+        System.out.println();
+        System.out.println("----------------Game Start-------------------");
         board.showBoard(board.getBoardView());
         do {
             int i,j;
-            do {
-                System.out.print("Please inspect = ");
-                i = game.input();
-                j = game.input();
-            } while (i==-1 || j==-1);
-            System.out.println("inspect "+i+","+j+" = "+board.inspect(i,j));
+            System.out.print("Please inspect (Row+Space+Col) = ");
+            i = game.input();
+            j = game.input();
+            if (i==-1 || j==-1 ) {
+                return true;
+            }
+            System.out.println("inspected "+i+","+j+" = "+board.inspect(i,j));
             board.showBoard(board.getBoardView());
             System.out.println();
         } while (board.getStatus_play());
 
         if (board.getStatus_win()) {
-            System.out.println("You Win");
+            System.out.println("*----------YOU WIN----------");
         } else if (board.getStatus_gameOver()) {
-            System.out.println("Game Over, You Lose");
+            System.out.println("*----Game Over, YOU LOSE----");
         }
         board.showBoard(board.getBoard());
         //return selected 0= exit game, else back to menu
-        return 0;
+        return true;
     }
     private void rule() {
+        System.out.println();
         System.out.println("----------------Rule of Game----------------");
         System.out.println("No special rule, just like normal Minesweaper");
         System.out.println("Thanks for ejoy it!");
@@ -97,14 +105,15 @@ public class Game {
     private void settings () {
         boolean exitSettings = false;
         do {
+            System.out.println();
             System.out.println("------------------Settings------------------");
             System.out.println("Current Settings:");
             System.out.println("Difficulty   = "+this.difficulty);
-            System.out.println("Board Height = "+board.getBoardHeight());
-            System.out.println("Board Width  = "+board.getBoardWidth());
+            System.out.println("Board Height = "+this.boardHeight);
+            System.out.println("Board Width  = "+this.boardWidth);
             System.out.println("Bombs        = "+board.getNumberOfBombs());
-            System.out.println("Bobm Symbol = "+"\" "+board.getBombSymbol()+" \"");
-            System.out.println("Board Symbol= "+"\" "+board.getBoardViewSymbol()+" \"");
+            System.out.println("Bobm Symbol = "+"\" "+this.bombSymbol+" \"");
+            System.out.println("Board Symbol= "+"\" "+this.boardSymbol+" \"");
             System.out.print("Edit settings (y/n)? : ");
             String selected = scanner.next();
             if (selected.equalsIgnoreCase("y") || selected.equalsIgnoreCase("yes")) {
@@ -213,7 +222,7 @@ public class Game {
     }
     private void edit_boardSymbol () {
         System.out.println();
-        System.out.println("Current Board Symbol= "+"\" "+board.getBoardViewSymbol()+" \"");
+        System.out.println("Current Board Symbol= "+"\" "+this.boardSymbol+" \"");
         System.out.print("New Symbol = ");
         char newSymbol = scanner.next().charAt(0);
         boardSymbol = newSymbol;
