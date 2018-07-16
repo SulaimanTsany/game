@@ -1,0 +1,7 @@
+--------------------How to Run---------------------
+
+1.  Compile the Game.java with "javac Game.java" on your terminal/CMD
+2.  If compile success then you get 2 new class file "Board.class" and "Game.class",
+    run the Game.class with "java Game" on your terminal/CMD
+
+-----------------Thanks for enjoy------------------
